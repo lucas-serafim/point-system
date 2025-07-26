@@ -18,7 +18,7 @@ public class Settings {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID string;
+    private UUID id;
 
     private Integer workday_hours;
     private Integer overtime_rate;
