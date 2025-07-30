@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class Users {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,4 +28,11 @@ public class Users {
 
     private String password;
     private UserRoleEnum role;
+
+    public User(String name, String email, String password, UserRoleEnum role) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
 }

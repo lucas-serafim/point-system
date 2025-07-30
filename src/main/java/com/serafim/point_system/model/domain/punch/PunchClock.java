@@ -1,6 +1,6 @@
 package com.serafim.point_system.model.domain.punch;
 
-import com.serafim.point_system.model.domain.users.Users;
+import com.serafim.point_system.model.domain.users.User;
 import com.serafim.point_system.model.enums.PunchClockTypeEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,7 +25,7 @@ public class PunchClock {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private Users user;
+    private User user;
     private PunchClockTypeEnum type;
     private LocalDateTime timestamp;
 }
