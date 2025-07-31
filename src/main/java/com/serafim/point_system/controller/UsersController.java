@@ -1,5 +1,7 @@
 package com.serafim.point_system.controller;
 
+import com.serafim.point_system.model.domain.users.LoginRequestDTO;
+import com.serafim.point_system.model.domain.users.LoginResponseDTO;
 import com.serafim.point_system.model.domain.users.UserRequestDTO;
 import com.serafim.point_system.model.domain.users.UserResponseDTO;
 import com.serafim.point_system.model.service.UserService;
@@ -25,5 +27,11 @@ public class UsersController {
         if (responseDTO == null) return ResponseEntity.badRequest().build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody() LoginRequestDTO loginRequestDTO) {
+        LoginResponseDTO responseDTO = this.userService.login(loginRequestDTO);
+        return ResponseEntity.ok(responseDTO);
     }
 }
