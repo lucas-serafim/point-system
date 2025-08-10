@@ -28,4 +28,10 @@ public class PunchClock {
     private User user;
     private PunchClockTypeEnum type;
     private LocalDateTime timestamp;
+
+    public PunchClock(User user, PunchClockTypeEnum type, LocalDateTime timestamp) {
+        this.user = user;
+        this.type = type;
+        this.timestamp = timestamp;
+    }
 }
