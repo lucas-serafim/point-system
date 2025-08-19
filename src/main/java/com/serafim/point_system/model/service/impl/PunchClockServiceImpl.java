@@ -1,11 +1,9 @@
 package com.serafim.point_system.model.service.impl;
 
-import com.serafim.point_system.model.domain.punch.PunchClock;
-import com.serafim.point_system.model.domain.punch.PunchClockRequestDTO;
-import com.serafim.point_system.model.domain.punch.PunchClockResponseDTO;
-import com.serafim.point_system.model.domain.punch.WorkDayDTO;
+import com.serafim.point_system.model.domain.punch.*;
 import com.serafim.point_system.model.domain.users.User;
 import com.serafim.point_system.model.repository.PunchClockRepository;
+import com.serafim.point_system.model.repository.UserRepository;
 import com.serafim.point_system.model.service.PunchClockService;
 import com.serafim.point_system.model.utils.AuthUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +13,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.Map;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,7 +23,9 @@ public class PunchClockServiceImpl implements PunchClockService {
     @Autowired
     private PunchClockRepository punchClockRepository;
 
-    @Override
+    @Autowired
+    private UserRepository userRepository;
+
     public PunchClockResponseDTO register(PunchClockRequestDTO dto) {
         LocalDateTime localDateTime = LocalDateTime.now();
         User user = AuthUtil.getCurrentUser();
@@ -44,13 +44,55 @@ public class PunchClockServiceImpl implements PunchClockService {
         );
     }
 
+    public List<EmployeeWorkDayDTO> listPunchRegisters(ListPunchRequestDTO dto) {
+
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        LocalDate date = LocalDate.now();
+
+        LocalDate start = dto.startDate().map(startDate -> LocalDate.parse(startDate, dateTimeFormatter)).orElse(date.minusDays(7));
+        LocalDate end = dto.endDate().map(endDate -> LocalDate.parse(endDate, dateTimeFormatter)).orElse(date);
+
+        List<User> userList = dto.employeeId()
+                .map(id -> this.userRepository.findById(id).stream().toList())
+                .orElse(this.userRepository.findAll());
+
+        List<EmployeeWorkDayDTO> dtoList = new ArrayList<>();
+
+        for (User user : userList) {
+            Map<LocalDate, List<PunchClock>> grouped = this.listAndGroupPunches(Optional.of(user.getId()));
+            List<WorkDayDTO> workDays = this.toWorkDayListDTO(grouped);
+
+            workDays.stream()
+                    .filter(workDay -> workDay.getDate().isAfter(start) && workDay.getDate().isBefore(end))
+                    .map(workDay -> new EmployeeWorkDayDTO(
+                            user.getName(),
+                            workDay.getDate(),
+                            workDay.getCheckIn(),
+                            workDay.getCheckOut(),
+                            workDay.getWorkedHours()
+                    )).forEach(dtoList::add);
+        }
+
+        return dtoList.stream().sorted().toList();
+    }
+
     public List<WorkDayDTO> punchHistory() {
         User user = AuthUtil.getCurrentUser();
-        List<PunchClock> punches = this.punchClockRepository.findAllByUserId(user.getId());
 
-        Map<LocalDate, List<PunchClock>> grouped = punches.stream().collect(Collectors.groupingBy(current -> current.getTimestamp().toLocalDate()));
+        assert user != null;
+        Map<LocalDate, List<PunchClock>> grouped = this.listAndGroupPunches(Optional.of(user.getId()));
 
-        return grouped.entrySet().stream().map(current -> {
+        return this.toWorkDayListDTO(grouped);
+    }
+
+    private Map<LocalDate, List<PunchClock>> listAndGroupPunches(Optional<UUID> employeeId) {
+        List<PunchClock> punches = employeeId.map(this.punchClockRepository::findAllByUserId).orElse(this.punchClockRepository.findAll());
+        return punches.stream().collect(Collectors.groupingBy(current -> current.getTimestamp().toLocalDate()));
+    }
+
+    private List<WorkDayDTO> toWorkDayListDTO(Map<LocalDate, List<PunchClock>> group) {
+        return group.entrySet().stream().map(current -> {
             LocalDate date = current.getKey();
             List<PunchClock> dayPunches = current.getValue();
 

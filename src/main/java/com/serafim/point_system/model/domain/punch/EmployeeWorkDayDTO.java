@@ -12,9 +12,10 @@ import java.time.LocalTime;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class WorkDayDTO {
+@NoArgsConstructor
+public class EmployeeWorkDayDTO implements Comparable<EmployeeWorkDayDTO> {
+    private String employee;
 
     private LocalDate date;
 
@@ -28,4 +29,9 @@ public class WorkDayDTO {
 
     @JsonProperty("worked-hours")
     private Long workedHours;
+
+    @Override
+    public int compareTo(EmployeeWorkDayDTO o) {
+        return getDate().compareTo(o.getDate());
+    }
 }
