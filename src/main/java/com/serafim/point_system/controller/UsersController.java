@@ -1,10 +1,11 @@
 package com.serafim.point_system.controller;
 
-import com.serafim.point_system.model.domain.users.dtos.login.LoginRequestDTO;
-import com.serafim.point_system.model.domain.users.dtos.login.LoginResponseDTO;
 import com.serafim.point_system.model.domain.users.dtos.UserRequestDTO;
 import com.serafim.point_system.model.domain.users.dtos.UserResponseDTO;
+import com.serafim.point_system.model.domain.users.dtos.login.LoginRequestDTO;
+import com.serafim.point_system.model.domain.users.dtos.login.LoginResponseDTO;
 import com.serafim.point_system.model.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class UsersController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> register(@RequestBody() UserRequestDTO requestDTO) {
+    public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody() UserRequestDTO requestDTO) {
         UserResponseDTO responseDTO = this.userService.register(requestDTO);
 
         if (responseDTO == null) return ResponseEntity.badRequest().build();
