@@ -1,6 +1,10 @@
 package com.serafim.point_system.model.service.impl;
 
 import com.serafim.point_system.model.domain.punch.*;
+import com.serafim.point_system.model.domain.punch.dtos.ListPunchRequestDTO;
+import com.serafim.point_system.model.domain.punch.dtos.PunchClockRequestDTO;
+import com.serafim.point_system.model.domain.punch.dtos.PunchClockResponseDTO;
+import com.serafim.point_system.model.domain.punch.dtos.ReportsRequestDTO;
 import com.serafim.point_system.model.domain.users.User;
 import com.serafim.point_system.model.repository.PunchClockRepository;
 import com.serafim.point_system.model.repository.UserRepository;
@@ -45,7 +49,6 @@ public class PunchClockServiceImpl implements PunchClockService {
     }
 
     public List<EmployeeWorkDayDTO> listPunchRegisters(ListPunchRequestDTO dto) {
-
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         LocalDate date = LocalDate.now();
@@ -84,6 +87,38 @@ public class PunchClockServiceImpl implements PunchClockService {
         Map<LocalDate, List<PunchClock>> grouped = this.listAndGroupPunches(Optional.of(user.getId()));
 
         return this.toWorkDayListDTO(grouped);
+    }
+
+    public EmployeeReportDTO reports(ReportsRequestDTO dto) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        LocalDate date = LocalDate.now();
+
+        LocalDate start = dto.startDate().map(startDate -> LocalDate.parse(startDate, dateTimeFormatter)).orElse(date.minusDays(7));
+        LocalDate end = dto.endDate().map(endDate -> LocalDate.parse(endDate, dateTimeFormatter)).orElse(date);
+
+        List<User> users = this.userRepository.findAll();
+
+        List<EmployeeHoursDTO> employeeHours = new ArrayList<>();
+
+        for (User user : users) {
+            Map<LocalDate, List<PunchClock>> grouped = this.listAndGroupPunches(Optional.of(user.getId()));
+
+            long workedHours = grouped.entrySet().stream()
+                    .filter(key -> key.getKey().isAfter(start) && key.getKey().isBefore(end))
+                    .mapToLong(current -> {
+                        List<PunchClock> dayPunches = current.getValue();
+
+                        LocalTime checkIn = dayPunches.getFirst().getTimestamp().toLocalTime();
+                        LocalTime checkOut = dayPunches.getLast().getTimestamp().toLocalTime();
+
+                        return Duration.between(checkIn, checkOut).toHours();
+                    }).sum();
+
+            employeeHours.add(new EmployeeHoursDTO(user.getName(), workedHours));
+        }
+
+        return new EmployeeReportDTO(employeeHours);
     }
 
     private Map<LocalDate, List<PunchClock>> listAndGroupPunches(Optional<UUID> employeeId) {

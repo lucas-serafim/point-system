@@ -1,7 +1,7 @@
 package com.serafim.point_system.controller;
 
-import com.serafim.point_system.model.domain.punch.PunchClockRequestDTO;
-import com.serafim.point_system.model.domain.punch.PunchClockResponseDTO;
+import com.serafim.point_system.model.domain.punch.dtos.PunchClockRequestDTO;
+import com.serafim.point_system.model.domain.punch.dtos.PunchClockResponseDTO;
 import com.serafim.point_system.model.domain.punch.WorkDayDTO;
 import com.serafim.point_system.model.service.PunchClockService;
 import org.springframework.beans.factory.annotation.Autowired;

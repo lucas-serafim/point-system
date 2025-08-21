@@ -1,11 +1,11 @@
 package com.serafim.point_system.controller;
 
+import com.serafim.point_system.model.domain.punch.EmployeeReportDTO;
 import com.serafim.point_system.model.domain.punch.EmployeeWorkDayDTO;
-import com.serafim.point_system.model.domain.punch.ListPunchRequestDTO;
-import com.serafim.point_system.model.domain.punch.WorkDayDTO;
+import com.serafim.point_system.model.domain.punch.dtos.ListPunchRequestDTO;
+import com.serafim.point_system.model.domain.punch.dtos.ReportsRequestDTO;
 import com.serafim.point_system.model.service.PunchClockService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,5 +35,17 @@ public class PunchClockAdminController {
                 Optional.ofNullable(endDate)
         ));
         return ResponseEntity.ok(dtoList);
+    }
+
+    @GetMapping("/reports")
+    public ResponseEntity<EmployeeReportDTO> reports(
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate
+    ) {
+        EmployeeReportDTO employeeReportDTO = this.punchClockService.reports(new ReportsRequestDTO(
+                Optional.ofNullable(startDate),
+                Optional.ofNullable(endDate)
+        ));
+        return ResponseEntity.ok(employeeReportDTO);
     }
 }

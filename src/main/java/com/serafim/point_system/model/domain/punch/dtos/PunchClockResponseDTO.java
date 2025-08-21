@@ -1,6 +1,5 @@
-package com.serafim.point_system.model.domain.punch;
+package com.serafim.point_system.model.domain.punch.dtos;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 public record PunchClockResponseDTO(

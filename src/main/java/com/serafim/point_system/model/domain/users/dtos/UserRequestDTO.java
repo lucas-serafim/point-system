@@ -1,4 +1,4 @@
-package com.serafim.point_system.model.domain.users;
+package com.serafim.point_system.model.domain.users.dtos;
 
 public record UserRequestDTO(
         String name,

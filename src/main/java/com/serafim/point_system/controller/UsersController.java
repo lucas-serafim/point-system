@@ -1,9 +1,9 @@
 package com.serafim.point_system.controller;
 
-import com.serafim.point_system.model.domain.users.LoginRequestDTO;
-import com.serafim.point_system.model.domain.users.LoginResponseDTO;
-import com.serafim.point_system.model.domain.users.UserRequestDTO;
-import com.serafim.point_system.model.domain.users.UserResponseDTO;
+import com.serafim.point_system.model.domain.users.dtos.login.LoginRequestDTO;
+import com.serafim.point_system.model.domain.users.dtos.login.LoginResponseDTO;
+import com.serafim.point_system.model.domain.users.dtos.UserRequestDTO;
+import com.serafim.point_system.model.domain.users.dtos.UserResponseDTO;
 import com.serafim.point_system.model.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

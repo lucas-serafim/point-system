@@ -1,6 +1,10 @@
 package com.serafim.point_system.model.service.impl;
 
 import com.serafim.point_system.model.domain.users.*;
+import com.serafim.point_system.model.domain.users.dtos.login.LoginRequestDTO;
+import com.serafim.point_system.model.domain.users.dtos.login.LoginResponseDTO;
+import com.serafim.point_system.model.domain.users.dtos.UserRequestDTO;
+import com.serafim.point_system.model.domain.users.dtos.UserResponseDTO;
 import com.serafim.point_system.model.enums.UserRoleEnum;
 import com.serafim.point_system.model.repository.UserRepository;
 import com.serafim.point_system.model.security.TokenService;
